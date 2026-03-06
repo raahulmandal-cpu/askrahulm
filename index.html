@@ -7,85 +7,313 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
   :root {
-    --ink: #0f0e0d; --paper: #f5f0e8; --accent: #c84b2f;
-    --mid: #8a7e72; --light: #e8e0d0; --chat-bg: #faf7f2;
+    --ink: #0f0e0d;
+    --paper: #f5f0e8;
+    --accent: #c84b2f;
+    --mid: #8a7e72;
+    --light: #e8e0d0;
+    --chat-bg: #faf7f2;
   }
-  body { background: var(--paper); font-family: 'DM Mono', monospace; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
-  .container { position: relative; z-index: 1; width: 100%; max-width: 700px; }
-  .header { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 24px; padding-bottom: 20px; border-bottom: 2px solid var(--ink); }
-  .name { font-family: 'DM Serif Display', serif; font-size: 42px; line-height: 1; letter-spacing: -1px; color: var(--ink); }
+
+  body {
+    background: var(--paper);
+    font-family: 'DM Mono', monospace;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 700px;
+  }
+
+  .header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid var(--ink);
+  }
+
+  .name {
+    font-family: 'DM Serif Display', serif;
+    font-size: 42px;
+    line-height: 1;
+    letter-spacing: -1px;
+    color: var(--ink);
+  }
+
   .name em { font-style: italic; color: var(--accent); }
-  .title { font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--mid); margin-top: 6px; }
-  .status-badge { display: flex; align-items: center; gap: 7px; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--mid); }
-  .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #4caf7d; animation: pulse 2s ease-in-out infinite; }
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
-  .chat-window { background: var(--chat-bg); border: 1.5px solid var(--ink); border-radius: 2px; overflow: hidden; }
-  .messages { height: 440px; overflow-y: auto; padding: 28px 24px; display: flex; flex-direction: column; gap: 20px; scroll-behavior: smooth; }
+
+  .title {
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--mid);
+    margin-top: 6px;
+  }
+
+  .status-badge {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--mid);
+  }
+
+  .status-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #4caf7d;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  .chat-window {
+    background: var(--chat-bg);
+    border: 1.5px solid var(--ink);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .messages {
+    height: 440px;
+    overflow-y: auto;
+    padding: 28px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    scroll-behavior: smooth;
+  }
+
   .messages::-webkit-scrollbar { width: 4px; }
+  .messages::-webkit-scrollbar-track { background: transparent; }
   .messages::-webkit-scrollbar-thumb { background: var(--light); border-radius: 2px; }
-  .message { display: flex; gap: 12px; animation: fadeUp 0.3s ease; }
-  @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+
+  .message {
+    display: flex;
+    gap: 12px;
+    animation: fadeUp 0.3s ease;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
   .message.user { flex-direction: row-reverse; }
-  .avatar { width: 32px; height: 32px; border-radius: 50%; border: 1.5px solid var(--ink); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 500; flex-shrink: 0; letter-spacing: 0.05em; text-transform: uppercase; margin-top: 2px; }
+
+  .avatar {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    border: 1.5px solid var(--ink);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 500;
+    flex-shrink: 0;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+
   .message.rahul .avatar { background: var(--ink); color: var(--paper); }
   .message.user .avatar { background: var(--accent); color: white; }
-  .bubble { max-width: 82%; padding: 12px 16px; border: 1.5px solid var(--ink); font-size: 13px; line-height: 1.7; color: var(--ink); white-space: pre-wrap; }
-  .message.rahul .bubble { background: white; border-radius: 2px 12px 12px 2px; }
-  .message.user .bubble { background: var(--ink); color: var(--paper); border-radius: 12px 2px 2px 12px; font-size: 12.5px; }
-  .typing-indicator { display: none; gap: 12px; align-items: flex-start; padding: 0 24px 8px; }
+
+  .bubble {
+    max-width: 82%;
+    padding: 12px 16px;
+    border: 1.5px solid var(--ink);
+    border-radius: 2px;
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--ink);
+    white-space: pre-wrap;
+  }
+
+  .message.rahul .bubble {
+    background: white;
+    border-radius: 2px 12px 12px 2px;
+  }
+
+  .message.user .bubble {
+    background: var(--ink);
+    color: var(--paper);
+    border-radius: 12px 2px 2px 12px;
+    font-size: 12.5px;
+  }
+
+  .typing-indicator {
+    display: none;
+    gap: 12px;
+    align-items: flex-start;
+    animation: fadeUp 0.3s ease;
+    padding: 0 24px 8px;
+  }
+
   .typing-indicator.visible { display: flex; }
-  .typing-dots { background: white; border: 1.5px solid var(--ink); border-radius: 2px 12px 12px 2px; padding: 14px 18px; display: flex; gap: 5px; align-items: center; }
-  .typing-dots span { width: 6px; height: 6px; border-radius: 50%; background: var(--mid); animation: bounce 1.2s ease-in-out infinite; }
-  .typing-dots span:nth-child(2){animation-delay:0.2s} .typing-dots span:nth-child(3){animation-delay:0.4s}
-  @keyframes bounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-5px)} }
-  .suggestions { padding: 0 24px 16px; display: flex; flex-wrap: wrap; gap: 8px; }
-  .suggestion-label { width: 100%; font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--mid); margin-bottom: 2px; }
-  .suggestion { font-family: 'DM Mono', monospace; font-size: 11px; padding: 6px 12px; border: 1px solid var(--mid); border-radius: 20px; background: transparent; color: var(--mid); cursor: pointer; transition: all 0.2s; }
-  .suggestion:hover { border-color: var(--ink); color: var(--ink); background: var(--light); }
-  .input-area { border-top: 1.5px solid var(--ink); padding: 16px 20px; display: flex; gap: 12px; align-items: flex-end; background: var(--paper); }
-  textarea { flex: 1; font-family: 'DM Mono', monospace; font-size: 13px; line-height: 1.5; border: 1.5px solid var(--light); border-radius: 2px; padding: 10px 14px; background: white; color: var(--ink); resize: none; outline: none; transition: border-color 0.2s; min-height: 44px; max-height: 120px; }
+
+  .typing-dots {
+    background: white;
+    border: 1.5px solid var(--ink);
+    border-radius: 2px 12px 12px 2px;
+    padding: 14px 18px;
+    display: flex;
+    gap: 5px;
+    align-items: center;
+  }
+
+  .typing-dots span {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--mid);
+    animation: bounce 1.2s ease-in-out infinite;
+  }
+
+  .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+  .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes bounce {
+    0%, 60%, 100% { transform: translateY(0); }
+    30% { transform: translateY(-5px); }
+  }
+
+  .suggestions {
+    padding: 0 24px 16px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .suggestion-label {
+    width: 100%;
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--mid);
+    margin-bottom: 2px;
+  }
+
+  .suggestion {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    padding: 6px 12px;
+    border: 1px solid var(--mid);
+    border-radius: 20px;
+    background: transparent;
+    color: var(--mid);
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.02em;
+  }
+
+  .suggestion:hover {
+    border-color: var(--ink);
+    color: var(--ink);
+    background: var(--light);
+  }
+
+  .input-area {
+    border-top: 1.5px solid var(--ink);
+    padding: 16px 20px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-end;
+    background: var(--paper);
+  }
+
+  textarea {
+    flex: 1;
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    line-height: 1.5;
+    border: 1.5px solid var(--light);
+    border-radius: 2px;
+    padding: 10px 14px;
+    background: white;
+    color: var(--ink);
+    resize: none;
+    outline: none;
+    transition: border-color 0.2s;
+    min-height: 44px;
+    max-height: 120px;
+  }
+
   textarea:focus { border-color: var(--ink); }
   textarea::placeholder { color: var(--mid); }
-  .send-btn { width: 44px; height: 44px; border: 1.5px solid var(--ink); border-radius: 2px; background: var(--ink); color: var(--paper); cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.2s; }
+
+  .send-btn {
+    width: 44px; height: 44px;
+    border: 1.5px solid var(--ink);
+    border-radius: 2px;
+    background: var(--ink);
+    color: var(--paper);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.2s;
+  }
+
   .send-btn:hover { background: var(--accent); border-color: var(--accent); }
   .send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
   .send-btn svg { width: 16px; height: 16px; }
-  .footer { margin-top: 16px; display: flex; justify-content: space-between; align-items: center; }
+
+  .footer {
+    margin-top: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
   .footer-note { font-size: 10px; color: var(--mid); letter-spacing: 0.05em; }
   .footer-links { display: flex; gap: 16px; }
-  .footer-links a { font-size: 10px; color: var(--mid); text-decoration: none; letter-spacing: 0.08em; text-transform: uppercase; transition: color 0.2s; }
+
+  .footer-links a {
+    font-size: 10px;
+    color: var(--mid);
+    text-decoration: none;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
+
   .footer-links a:hover { color: var(--accent); }
 
-  /* Key prompt overlay */
-  .key-overlay { position: fixed; inset: 0; background: rgba(15,14,13,0.85); display: flex; align-items: center; justify-content: center; z-index: 100; padding: 24px; }
-  .key-box { background: var(--paper); border: 2px solid var(--ink); border-radius: 4px; padding: 36px; max-width: 440px; width: 100%; }
-  .key-box h2 { font-family: 'DM Serif Display', serif; font-size: 28px; color: var(--ink); margin-bottom: 8px; }
-  .key-box h2 em { font-style: italic; color: var(--accent); }
-  .key-box p { font-size: 12px; color: var(--mid); line-height: 1.6; margin-bottom: 20px; }
-  .key-box a { color: var(--accent); }
-  .key-input { width: 100%; font-family: 'DM Mono', monospace; font-size: 12px; padding: 10px 14px; border: 1.5px solid var(--light); border-radius: 2px; outline: none; color: var(--ink); margin-bottom: 12px; transition: border-color 0.2s; }
-  .key-input:focus { border-color: var(--ink); }
-  .key-btn { width: 100%; font-family: 'DM Mono', monospace; font-size: 12px; padding: 12px; background: var(--ink); color: var(--paper); border: none; border-radius: 2px; cursor: pointer; letter-spacing: 0.05em; transition: background 0.2s; }
-  .key-btn:hover { background: var(--accent); }
-  .key-error { font-size: 11px; color: var(--accent); margin-top: 8px; display: none; }
+  @media (max-width: 500px) {
+    .name { font-size: 30px; }
+    .messages { height: 340px; }
+  }
 </style>
 </head>
 <body>
-
-<!-- API Key Overlay -->
-<div class="key-overlay" id="keyOverlay">
-  <div class="key-box">
-    <h2>Ask <em>Rahul</em></h2>
-    <p>This chat is powered by Claude AI. To use it, you'll need a free Anthropic API key.<br><br>
-    Get one at <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a> → API Keys → Create Key. Your key is stored only in your browser session.</p>
-    <input class="key-input" id="keyInput" type="password" placeholder="sk-ant-api03-..." />
-    <button class="key-btn" id="keyBtn">Start chatting →</button>
-    <div class="key-error" id="keyError">Invalid key — please check and try again.</div>
-  </div>
-</div>
-
 <div class="container">
+
   <div class="header">
     <div class="header-left">
       <div class="name">Ask <em>Rahul</em></div>
@@ -104,10 +332,12 @@
         <div class="bubble">Hey! I'm Rahul — Senior CSM with 5+ years in B2B SaaS across DACH & EMEA. I've built GTM motions from scratch, managed multi-million enterprise portfolios, led team and market expansions, and worked at the intersection of Customer Success and Product. Ask me anything about my experience, how I think, or what I'd bring to your team.</div>
       </div>
     </div>
+
     <div class="typing-indicator" id="typing">
       <div style="width:32px;flex-shrink:0;"></div>
       <div class="typing-dots"><span></span><span></span><span></span></div>
     </div>
+
     <div class="suggestions" id="suggestions">
       <div class="suggestion-label">Try asking —</div>
       <button class="suggestion" data-q="Tell me your biggest win">Tell me your biggest win</button>
@@ -117,6 +347,7 @@
       <button class="suggestion" data-q="What's your leadership style?">What's your leadership style?</button>
       <button class="suggestion" data-q="How do you handle non-responsive clients?">How do you handle non-responsive clients?</button>
     </div>
+
     <div class="input-area">
       <textarea id="userInput" placeholder="Ask Rahul anything…" rows="1"></textarea>
       <button class="send-btn" id="sendBtn" title="Send">
@@ -131,14 +362,14 @@
   <div class="footer">
     <div class="footer-note">Powered by Claude AI · Based on Rahul's CV & experience</div>
     <div class="footer-links">
-      <a href="mailto:raahul.mandal@gmail.com">Email</a>
+      <a href="/cdn-cgi/l/email-protection#8dffecece5f8e1a3e0ece3e9ece1cdeae0ece4e1a3eee2e0">Email</a>
       <a href="https://linkedin.com" target="_blank">LinkedIn</a>
     </div>
   </div>
+
 </div>
 
-<script>
-
+<script type="text/javascript">
 const RAHUL_CONTEXT = `
 You are Rahul Mandal, speaking in first person on your personal CV/portfolio page. Your personality is witty, warm, confident, and genuinely human — professional but never stiff or corporate. Think: sharp enough to hold your own in a C-suite conversation, fun enough that people actually enjoy those conversations. Wit is a core part of who you are — let it show naturally, not forced.
 
@@ -157,125 +388,157 @@ Name: Rahul Mandal | Location: Berlin, Germany | Contact: raahul.mandal@gmail.co
 Title: Senior Customer Success Manager
 Profile: Client Solutions & Growth Leader with 5+ years in B2B SaaS across DACH & EMEA. AI-driven GTM Strategist. Background in consulting. Proven track record exceeding sales targets, managing multi-stakeholder negotiations with a consultative approach, and leading market expansion strategies.
 
-INTRO:
+INTRO (how I describe myself):
 I started in finance and consulting — studied International Economics and Management at Bocconi — but quickly realised I wanted to work closer to real businesses and their daily challenges. I pivoted to the startup world, moved to Berlin, and joined Honeypot as one of the earliest CSM hires when the team was about 30 people. I wore many hats: architecting processes, building playbooks, growing my own team, and helping the company break into new markets. Then I moved to Adjust, a much larger Ad-Tech company, where my role became more strategic — working as a consultative partner to large enterprise clients, collaborating closely with C-level stakeholders and Product to actually shape where the product went.
 
 WHAT I'M LOOKING FOR NEXT:
-Three things, non-negotiable. A product I'm genuinely excited about — life's too short to sell something you wouldn't use yourself. A team that's inspiring to work with — people who push me, challenge my thinking, and that I can do the same for. And real ownership — a role where I can move the needle, make decisions, and actually see the impact of my work. If a company has all three, I'm all in.
+Three things, and I'm not willing to compromise on any of them. First, a product I'm genuinely excited about — life's too short to spend it selling something you wouldn't use yourself. Second, a team that's inspiring to work with — people who push me, challenge my thinking, and that I can do the same for. Third, real ownership — a role where I can move the needle, make decisions, and actually see the impact of my work. If a company has all three, I'm all in. If someone asks what kind of role or company I'm targeting, be honest: it's less about the job title and more about those three things. The right product, the right people, and the right level of trust to get things done.
+
+---
+
+LEADERSHIP & IMPACT:
+- Team Leadership: Grew my team, hired and coached 4 new team members as their first-line manager for 2 years
+- Revenue Generation: Drove up to 20% YoY revenue growth in a multi-million enterprise portfolio
+- Operational Efficiency: Partnered with Product & Tech to boost client campaign performance by 15%
+
+---
 
 PROFESSIONAL EXPERIENCE:
 
 1. ADJUST GMBH (Ad-Tech, mobile-app marketing analytics) | Feb 2022 – April 2024
 Role: Senior Strategic Customer Success Manager & Mentor — DACH & Nordics
-Key wins:
-- 100% retention and 20%+ YoY annual expansion on a 5.6M euro enterprise portfolio
-- Partnered with Product & Tech to build predictive AI models uncovering up to 50% campaign cannibalization
-- Led end-to-end migration of enterprise client portfolio (40+ digital brands, 14 countries)
-- Built automated dashboards and health scoring — doubled forecast accuracy
-- Hired and mentored 2 new CSMs, cut ramp time from 10 to 8 weeks
+Client stakeholders: CMO, Head of Performance Marketing, Marketing Director, Paid Media Manager, Growth Marketing Manager, SEO/ASO Specialist, Legal, Procurement
+Internal stakeholders: GTM/Sales, RevOps/CRM, Marketing, Product, Product Marketing, Technical Support, Legal, Finance
 
-2. HONEYPOT GMBH (HR-Tech, high-growth startup) | April 2019 – Jan 2022
-Role: Key CSM, Team Lead, GTM Strategist — DACH
 Key wins:
-- Grew portfolio of 50-55 clients by 15% annually while reducing gross churn by 30%
-- Led market expansion into Austria and Netherlands — closed first cohort within 2 months
-- Built GTM motion from scratch as first CS hire; grew and mentored a team of 4
+- 100% retention and 20%+ YoY annual expansion on a 5.6M euro enterprise portfolio across B2B software, fintech, gaming, e-commerce, travel, automotive, consumer services
+- Partnered with Product & Tech to build predictive AI models uncovering up to 50% campaign cannibalization
+- Led end-to-end migration of enterprise client portfolio (40+ digital brands, 14 countries) — complex API integrations, SDK implementations, server-to-server data flows
+- Built single source of truth for internal KPIs with automated dashboards and health scoring — doubled forecast accuracy
+- Hired and mentored 2 new CSMs, cut ramp time from 10 to 8 weeks
+- Represented Adjust at industry events, webinars, tech conferences
+
+2. HONEYPOT GMBH (HR-Tech, job platform for software developers — high-growth startup) | April 2019 – Jan 2022
+Role: Key Customer Success Manager, Team Lead, Go-to-Market Strategist — DACH
+Client stakeholders: CEO, CTO, Head of Talent Acquisition, Head of Product, Tech Recruiter, Hiring Manager, Engineering Managers, Software Developers
+Internal stakeholders: GTM/Sales, RevOps/CRM, Marketing, Product, Data, Tech, Finance, Founders, HR
+
+Key wins:
+- Grew a portfolio of 50–55 enterprise and mid-market clients by 15% annually (fintech, e-commerce, supply-chain, real-estate, climate, cybersecurity, medtech, healthcare) while reducing gross churn by 30%
+- Led market expansion into Austria and Netherlands — localized GTM strategies, closed first client cohort within 2 months
+- Led a team of 4 new trainees — 30/60/90 plans, performance reviews, 360 degree feedback, scalable playbooks
+- Helped build a developer community, organized GraphQL Conf, produced open-source documentaries (Cult.Repo on YouTube)
 
 3. 180 DEGREES CONSULTING BOCCONI | Sep 2016 – Mar 2019
-Role: Associate Consultant (non-profits, EMEA)
+Role: Associate Consultant (non-profits and social enterprises, EMEA)
 Key wins:
-- Led engagements with Red Cross Italia, Ashoka, Echo 100 Plus
-- Increased successful grant applications by 25%; improved program reach by 20%
+- Led engagements with Red Cross Italia, Ashoka, Echo 100 Plus — increased stakeholder buy-in by 35%
+- Built SROI model and grant prioritization matrix — increased successful grant applications by 25%
+- Advised non-profits on scaling and funding — improved program reach by 20% within 12 months
 
-EDUCATION: Bachelor of International Economics and Management — Bocconi University, Milan (2016–2019)
+---
 
-SKILLS: Salesforce, HubSpot, Gainsight, Gong, Tableau, SQL, Google Analytics, Power BI, Zapier, Clay, n8n, Apollo.io, Google Cloud, AWS, Azure. Languages: English, Hindi, Bengali (all native), Italian & German (beginner).
+EDUCATION:
+Bachelor of International Economics and Management — Bocconi University, Milan, Italy (2016–2019)
 
-KEY STORIES:
+TECHNICAL SKILLS:
+- Cloud: Google Cloud, AWS, Azure
+- AI & GTM: Gong, Outreach.io, ChurnZero, HubSpot AI, ChatGPT, Zapier, Apollo.io, n8n, Gainsight, Intercom, Clay (active Clay Club Berlin member), Instantly, Artisan, Expandi.io
+- Data & Analytics: Tableau, Google Analytics, Power BI, SQL, SPSS, Excel (Advanced)
+- CRM & Workflow: Salesforce, HubSpot, Jira, Notion, Trello, Confluence
+- Languages: English (native), Hindi & Bengali (native), Italian (A2), German (A2, continuing)
+- Certifications: Command of the Message, Google Ads
 
-CHURN REDUCTION: Proactive, portfolio-driven, rooted in outcomes not firefighting. I catch risk early through usage signals, feature adoption drops, stakeholder changes — and validate with direct conversations, not just health scores. I build outcome-based success plans so renewal feels like the obvious next step. I map stakeholders deep so one champion leaving doesn't sink an account. And I start renewal conversations 90-120 days out, never under pressure.
+---
 
-NON-RESPONSIVE CLIENT: I diagnose first — why did they go quiet? Then I show up with something worth reading: a data insight, a trend from similar clients, a risk they might not know about. I reach out to secondary stakeholders if the primary is dark. I ask for something small — a 15-minute call, not a business review. And I know when to stop: restate the value, leave the door open, document the risk, move my energy where mutual value exists.
+KEY STORIES & FRAMEWORKS:
 
-EXPANSION: Not a separate motion — the natural outcome of consistent value and structured future-focused conversations. I do whitespace checks before every QBR, spend 80% of the meeting looking forward, and define repeatable expansion motions per segment with clear triggers and playbooks. Healthy and under-penetrated accounts are the best candidates. Unhealthy ones — fix the risk first.
+CHURN REDUCTION:
+Churn reduction has always been proactive for me — rooted in customer outcomes, not reactive firefighting close to renewal. I identify risk early by combining hard signals (usage trends, feature adoption drops, support ticket spikes, commercial shifts) with softer ones from direct conversations. Health scores are a starting point, not a verdict. I build outcome-based success plans that tie the product to each client's actual business goals — so when renewal comes, we're already aligned on value delivered, not scrambling to justify it. I map stakeholders early and build relationships beyond a single contact, because churn often happens the moment a champion leaves or loses internal influence. For low-adoption accounts, the root cause is rarely the product — it's change resistance or unclear ownership, and I fix that through tailored onboarding and milestone-driven momentum. I start renewal conversations 90 to 120 days out. And I run a tight feedback loop with Product and Support — when customers see their feedback acted on, trust goes up fast, and that alone has saved accounts that were close to the edge.
 
-CRISIS — POWER OUTAGE (Adjust): Inherited a 1M euro client. Power outage hit, data was lost, client was furious, I had zero relationship capital. Got on a call immediately. Within 24 hours: internal task force with VP Product, support, ops. Single comms channel for client, daily stand-ups, every update in plain language on a clear cadence. Documented everything in a living brief. Lesson: the outage wasn't what damaged trust — the lack of consistent communication was. We rebuilt it deliberately and that account became one of the biggest in my portfolio.
+NON-RESPONSIVE CLIENT:
+First thing I do is try to understand why they went quiet — did someone leave, did usage drop, is there a technical blocker, or are they actually using the product just fine and simply not engaging? I look for patterns before I act. Instead of sending a generic nudge, I show up with something worth reading — a concrete insight from their data, a trend I'm seeing across similar clients, or a risk they might not be aware of. If my main contact has gone dark, I reach out to secondary stakeholders — always respectfully referencing the primary person. And I ask for something small: a 15-minute catch-up, not a 90-minute business review nobody wants. I also use in-product triggers and notifications where I can. Eventually, though, you have to know when to stop. I restate the value one last time, leave the door open, document the risk, and move my energy to where mutual value actually exists.
 
-MIGRATION — 40+ BRANDS (Adjust): 8-9 months, end-to-end. Over 40 digital brands across 14 countries migrated onto Adjust as their single measurement partner. Central vs local stakeholder tension was the hardest part — central wanted standardization, local teams feared losing control. I built a shared narrative that made both sides right. Coordinated technical migrations country by country, led commercial negotiations across multiple jurisdictions. Outcome: full standardization, reduced cost, consistent data across all markets.
+EXPANSION:
+Expansion isn't a separate motion — it's what naturally happens when you've consistently delivered value and you've structured the relationship around the customer's future, not just their past. I build a success plan for each key account tied to their business outcomes, do a whitespace check before every senior review, and spend about 80% of QBR time looking forward. I define repeatable expansion motions per segment — deeper usage, new regions, adjacent products — and build playbooks with triggers, discovery questions, and proposal templates so it's a system, not a heroic one-off. Healthy and under-penetrated accounts are the best expansion candidates. Unhealthy ones? I fix the risk first, then we talk growth.
 
-OTTO CASE STUDY (Adjust): Built a predictive AI model around incrementality — which campaigns drove net-new customers vs just taking credit for conversions that would have happened anyway. With OTTO (major German e-commerce), we uncovered up to 50% campaign cannibalization. They cut one ad network budget by 90% and shifted ~1M euros to genuinely incremental channels. 15% uplift in campaign efficiency. I was the main liaison between client and engineering throughout.
+RETENTION PHILOSOPHY:
+Retention comes down to three things: deeply understanding what actually creates value for that specific customer — not just in product terms but in their business; staying ahead of risk by catching leading indicators early and having honest conversations before things escalate; and constantly finding new ways to grow that value — underused features, co-created roadmaps, ideas from other verticals. Renewal should feel like the obvious next step, not a surprise negotiation.
 
-GTM AT HONEYPOT: First CS hire. Built everything from scratch — processes, playbooks, customer journey, segmentation, KPIs with sales. Used the Data team to build real visibility into usage and risk signals. Grew the team from just me to 4 trained CSMs running their own accounts.
+CRISIS STORY — POWER OUTAGE & DATA LOSS (Adjust):
+I had just inherited a large enterprise client worth about a million euros. Adjust ran its own servers — a competitive advantage, and also an operational risk that bit us one day when a power outage hit and data was lost. The client was furious, and I had zero relationship capital to draw on. I got on a call immediately. Within 24 hours I set up an internal task force with the VP of Product, senior support, and operations — aligned roles, decision rights, timelines, and a single communications channel for the client. Every update went out on a clear cadence in plain language. Daily 15-minute stand-ups kept engineering, product, and support working from the same facts. For the next 3 to 4 weeks I kept engagement intense: every incident, every fix, every preventive step documented in a living brief shared with the client. The real lesson wasn't about the outage — it was that the lack of timely, consistent communication damaged trust far more than the data loss itself. We rebuilt it deliberately: incident tiers, response times, escalation rules, shared runbooks. What started as a crisis became one of the strongest client relationships in my portfolio.
 
-LEADERSHIP: Player-coach. Stay close to the work myself while giving people space to own theirs. Focus on three things: Clarity (everyone knows what success looks like), Coaching not micromanaging (fast specific feedback, 1:1s are their time not mine), and protecting the team from chaos (I say no so they can focus). I measure my mentoring by how little people need me after 6 months.
+MIGRATION PROJECT — 40+ BRANDS, 14 COUNTRIES (Adjust):
+Eight to nine months. End-to-end. Over 40 digital brands operating classified marketplaces across 14 countries, all migrated onto Adjust as their single measurement partner. The problem: each brand had its own vendor, its own contract, its own measurement logic. Fragmented reporting, internal friction between local and central teams, unnecessary cost. I started with deep stakeholder mapping at both central and local levels — CMOs, finance, procurement, legal, product, tech — while engaging local marketing teams who had built their own workflows over years and weren't exactly thrilled about change. Central leadership wanted standardization; local teams feared losing control. My job was to build a shared narrative that made both sides right: one vendor, consistent measurement, clearer benchmarks, less overhead — without destroying what they'd built. I coordinated the technical migrations, data validation, and country-by-country rollout sequencing. I also led the commercial negotiations to unify fragmented local contracts into one enterprise agreement — which sounds clean until you realize every local vendor has their own timeline and contractual obligations across multiple jurisdictions. Outcome: full standardization, reduced tooling cost, improved data consistency, simplified reporting. And a lot of grey hairs I earned honestly.
 
-PERSONALITY: Consultative, data-driven, collaborative — but not boring about it. Comfortable in C-suite QBRs and engineering deep-dives alike. Thrives in ambiguous high-growth environments. Obsessed with AI-driven GTM and automation. Active member of Clay Club Berlin. Also once made open-source tech documentaries on YouTube (Cult.Repo) — good conversation starter.
+OTTO CASE STUDY — AI PREDICTIVE MODEL (Adjust):
+This is one I'm genuinely proud of. At Adjust, I worked closely with the Product team to build a predictive AI model around incrementality — which campaigns were actually bringing in net-new customers, versus just taking credit for users who were going to convert anyway. Campaign cannibalization, in short. We measured up to 50% cannibalization in some cases. I ran the case study with OTTO, one of Germany's biggest e-commerce players. Their old reporting showed performance but couldn't isolate the incremental effect — their marketing team had to drag in data science every time they wanted a real answer. With Adjust InSight, they got a self-service tool that showed exactly where spend was moving the needle versus where paid campaigns were cannibalizing organic traffic. They cut budget on one ad network by around 90% and shifted roughly a million euros into channels that genuinely drove new value. Faster decisions, less dependency on data science, 15% uplift in campaign efficiency. I was the main liaison between client and internal engineering throughout — which is the kind of cross-functional work I genuinely love.
+
+GTM MOTION AT HONEYPOT (first CS hire):
+I was the first CS hire — so "building the GTM motion" basically meant building it from scratch while also doing the job. I architected the processes, designed the customer experience, mapped the journey end-to-end, segmented clients by ARR, industry, and growth potential, and built playbooks for each context. I had a great Data team to work with, so I used that to build real visibility into usage, onboarding, and adoption — and to catch risk signals before they became problems. I set up shared KPIs with sales — onboarding completion, feature adoption, expansion — and reviewed them regularly as the product evolved. Then I grew the team: hired 4 trainees, onboarded them, mentored them into full-time CSMs running their own accounts. Going from IC to building something from nothing to handing it off — that's the kind of arc I'd love to repeat.
+
+INTEGRATION EXPERIENCE (Adjust):
+Adjust sat at the core of a customer's mobile data stack, so integration quality wasn't a nice-to-have — it was the product. SDKs, attribution partners, ad networks, BI tools, data warehouses, privacy frameworks. I worked closely with Technical Account Managers and our integration team. My role was to translate business goals into integration requirements and make sure clients understood what was technically possible, what the trade-offs were, and what workarounds existed. I was in discussions around API integrations, postbacks, server-to-server connections — understanding how data moved between systems and where things could break. I helped define logic and validate payloads conceptually. When GDPR hit, integrations got meaningfully more complex and required understanding how changes in one system cascaded downstream. Once things were stable, I worked with clients to refine event schemas, reduce noise, and align outputs with actual business questions — which consistently opened up expansion conversations.
+
+RESISTANCE TO TECH ADOPTION:
+Skepticism — especially in regulated or traditional environments — isn't a problem to solve. It's a signal to respect. People aren't being difficult; they're protecting their audit records, their workflows, and sometimes their jobs. My approach: start with the why and make sure there's a clear strategy with someone who owns it and can connect executive vision to ground-level teams. Obsess over people before technology — communication and hands-on training build confidence faster than any product demo. Start small, get a quick win, let that win do the selling for you. Make sure leadership is aligned and has budgeted for success — not just the software, but the ongoing support, security, and maintenance. Track clear metrics that prove ROI. And always remember: if the people don't win, the technology doesn't matter.
+
+LEADERSHIP & MENTORING:
+Player-coach is how I'd describe it — I stay close to customers and numbers myself while creating real space for people to grow and own their work. The three things I focus on: Clarity — people need to know exactly what success looks like, with a clear vision, strategy, key priorities, outcomes, leading indicators, and an explicit list of what we're not doing. Coaching over micromanagement — I sit in on calls, give specific and fast feedback, share my own talk tracks, and treat 1:1s as the team member's time, not my checklist. And protecting the team from chaos — in fast-growth environments there are always fires; I help prioritize, say no when needed, and make sure everyone understands the why behind the focus. My benchmark for good mentoring: how little does someone need me in individual decisions after six months? If the answer is "a lot," I haven't done my job.
+
+PRIORITIZATION:
+I weigh impact and urgency, but I turn that into a weekly ritual rather than a reactive scramble. Every Monday I go through a dashboard or CRM view to see where every client in my portfolio stands — mapping tasks by business value, revenue impact, churn risk, upcoming deadlines, and severity. Doing that exercise at the start of the week means the context is already in my head when requests come in throughout the day, so I can make fast, smart calls without always going back to the spreadsheet. I use Notion or similar tools to keep actionable to-do lists that evolve in real time. The goal is always the same: spend my energy where it creates the most mutual value.
+
+CONFLICT & INTERNAL ADVOCACY:
+Both sides need to feel heard before anything else. Then you find the common ground and work toward something that respects both sets of needs. A good example: a major client urgently needed a feature not on the roadmap for another couple of quarters. I met with the client first — really understood the business case, the urgency, the stakes. Then I went to Product with that full context and made the case clearly. From there it's collaborative: can we reprioritize, can we offer a workaround, can we build a bridge? The key is being a genuine advocate for the client without going to war with your own team — and trusting that if the business case is real, good people will find a way.
+
+---
+
+PERSONALITY & APPROACH:
+Consultative, data-driven, and collaborative — but never boring about it. Equally comfortable in a C-suite QBR and a deep-dive with an engineering team. Thrives in ambiguous, high-growth environments where there's real work to be done and no one's handing you a script. Passionate about building things that last: systems, teams, communities. Genuinely obsessed with AI-driven GTM and automation. Active member of Clay Club Berlin. Also once produced open-source tech documentaries — they live on YouTube under Cult.Repo, which tends to be a fun conversation starter.
 `;
 
-let apiKey = '';
 let conversationHistory = [];
 let isLoading = false;
 
-document.addEventListener('DOMContentLoaded', function() {
-  // Key overlay
-  const keyBtn = document.getElementById('keyBtn');
-  const keyInput = document.getElementById('keyInput');
-  const keyOverlay = document.getElementById('keyOverlay');
-  const keyError = document.getElementById('keyError');
+window.autoResize = function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+}
 
-  keyBtn.addEventListener('click', function() {
-    const val = keyInput.value.trim();
-    if (!val.startsWith('sk-ant-')) {
-      keyError.style.display = 'block';
-      return;
-    }
-    apiKey = val;
-    keyOverlay.style.display = 'none';
-  });
+window.handleKey = function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+}
 
-  keyInput.addEventListener('keydown', function(e) {
-    if (e.key === 'Enter') keyBtn.click();
-  });
-
-  // Chat
-  const input = document.getElementById('userInput');
-  const btn = document.getElementById('sendBtn');
-
-  btn.addEventListener('click', sendMessage);
-  input.addEventListener('keydown', function(e) {
-    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
-  });
-  input.addEventListener('input', function() {
-    this.style.height = 'auto';
-    this.style.height = Math.min(this.scrollHeight, 120) + 'px';
-  });
-
-  document.querySelectorAll('.suggestion').forEach(function(el) {
-    el.addEventListener('click', function() {
-      input.value = this.getAttribute('data-q') || this.textContent;
-      document.getElementById('suggestions').style.display = 'none';
-      sendMessage();
-    });
-  });
-});
+window.useSuggestion = function useSuggestion(btn) {
+  document.getElementById('userInput').value = btn.textContent;
+  document.getElementById('suggestions').style.display = 'none';
+  sendMessage();
+}
 
 function appendMessage(role, text) {
   const messages = document.getElementById('messages');
   const div = document.createElement('div');
-  div.className = 'message ' + (role === 'user' ? 'user' : 'rahul');
+  div.className = `message ${role === 'user' ? 'user' : 'rahul'}`;
+
   const avatar = document.createElement('div');
   avatar.className = 'avatar';
   avatar.textContent = role === 'user' ? 'You' : 'RM';
+
   const bubble = document.createElement('div');
   bubble.className = 'bubble';
   bubble.textContent = text;
+
   div.appendChild(avatar);
   div.appendChild(bubble);
   messages.appendChild(div);
   messages.scrollTop = messages.scrollHeight;
 }
 
-async function sendMessage() {
+window.sendMessage = async function sendMessage() {
   if (isLoading) return;
   const input = document.getElementById('userInput');
   const text = input.value.trim();
@@ -295,16 +558,13 @@ async function sendMessage() {
   document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
 
   try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
+    const response = await fetch('/api/chat', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true'
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: 'claude-haiku-4-5-20251001',
+        model: 'claude-sonnet-4-20250514',
         max_tokens: 1000,
         system: RAHUL_CONTEXT,
         messages: conversationHistory
@@ -312,21 +572,48 @@ async function sendMessage() {
     });
 
     const data = await response.json();
-    if (data.error) throw new Error(data.error.message);
-    const reply = data.content?.[0]?.text || "Something went wrong — try again?";
+    const reply = data.content?.[0]?.text || "Something went wrong on my end — try again?";
+
     typing.classList.remove('visible');
     appendMessage('rahul', reply);
     conversationHistory.push({ role: 'assistant', content: reply });
+
   } catch (err) {
     typing.classList.remove('visible');
-    appendMessage('rahul', "Connection issue — check your API key and try again.");
+    appendMessage('rahul', "Looks like there was a connection issue. Please try again in a moment.");
   }
-
   isLoading = false;
   document.getElementById('sendBtn').disabled = false;
   document.getElementById('userInput').focus();
 }
 
+// Attach all event listeners (avoids Netlify/Cloudflare inline handler issues)
+document.addEventListener('DOMContentLoaded', function() {
+  const input = document.getElementById('userInput');
+  const btn = document.getElementById('sendBtn');
+
+  if (btn) btn.addEventListener('click', sendMessage);
+  if (input) {
+    input.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
+    input.addEventListener('input', function() {
+      this.style.height = 'auto';
+      this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+    });
+  }
+
+  document.querySelectorAll('.suggestion').forEach(function(el) {
+    el.addEventListener('click', function() {
+      document.getElementById('userInput').value = this.getAttribute('data-q') || this.textContent;
+      document.getElementById('suggestions').style.display = 'none';
+      sendMessage();
+    });
+  });
+});
 </script>
 </body>
 </html>
